@@ -1,0 +1,236 @@
+%% Dr Alun Moon
+%% assignment-template.tex, generated from assignment-template.dtx
+\documentclass[12pt]{article}
+\usepackage[british]{babel}
+
+\usepackage{url}
+\usepackage[round]{natbib}
+\usepackage{infoboxes}
+
+\usepackage{latexsym}
+\usepackage{tlatex}
+\usepackage{color}
+\definecolor{boxshade}{gray}{.8}
+\setboolean{shading}{true}
+
+\usepackage{enumerate,
+            siunitx}
+
+\begin{document}
+
+\section{Car-park Specification}\label{lms.report}
+\subsection{The Specification} 
+\begin{tla}
+------------------------------ MODULE carpark ------------------------------
+EXTENDS Naturals, FiniteSets
+CONSTANT Capacity, Cars
+VARIABLE carpark
+
+TypeInvariant == carpark \in SUBSET Cars   \* Car park contains some set of cars
+
+Safety == Cardinality(carpark) \leq Capacity \* Car park is not over capacity 
+ 
+
+Init == carpark = {}  \* an empty carpark
+    
+Enters(car) == 
+    /\ Cardinality(carpark) < Capacity \* is there space ?
+    /\ car \notin carpark  \* a car in the carpark cant enter 
+    /\ carpark' = carpark \union {car} \* A car enters the carpark
+
+Leaves(car) ==
+    /\ car \in carpark \* only cars in the carpark can leave
+    /\ carpark' = carpark \ {car}
+    
+Next ==
+    \/ \E car \in Cars : Enters(car)
+    \/ \E car \in carpark : Leaves(car)
+
+Spec == Init /\ [][Next]_carpark
+=============================================================================
+\end{tla}
+\begin{tlatex}
+\@x{}\moduleLeftDash\@xx{ {\MODULE} carpark}\moduleRightDash\@xx{}%
+\@x{ {\EXTENDS} Naturals ,\, FiniteSets}%
+\@x{ {\CONSTANT} Capacity ,\, Cars}%
+\@x{ {\VARIABLE} carpark}%
+\@pvspace{8.0pt}%
+\@x{ TypeInvariant \.{\defeq} carpark \.{\in} {\SUBSET} Cars\@s{8.2}}%
+\@y{%
+  Car park contains some set of cars
+}%
+\@xx{}%
+\@pvspace{8.0pt}%
+\@x{ Safety \.{\defeq} Cardinality ( carpark ) \.{\leq} Capacity}%
+\@y{%
+  Car park is not over capacity 
+}%
+\@xx{}%
+\@pvspace{16.0pt}%
+\@x{ Init \.{\defeq} carpark \.{=} \{ \}\@s{4.1}}%
+\@y{%
+  an empty carpark
+}%
+\@xx{}%
+\@pvspace{8.0pt}%
+\@x{ Enters ( car ) \.{\defeq}}%
+\@x{\@s{16.4} \.{\land} Cardinality ( carpark ) \.{<} Capacity}%
+\@y{%
+  is there space ?
+}%
+\@xx{}%
+\@x{\@s{16.4} \.{\land} car \.{\notin} carpark\@s{4.1}}%
+\@y{%
+  a car in the carpark cant enter 
+}%
+\@xx{}%
+\@x{\@s{16.4} \.{\land} carpark \.{'} \.{=} carpark \.{\cup} \{ car \}}%
+\@y{%
+  A car enters the carpark
+}%
+\@xx{}%
+\@pvspace{8.0pt}%
+\@x{ Leaves ( car ) \.{\defeq}}%
+\@x{\@s{16.4} \.{\land} car \.{\in} carpark}%
+\@y{%
+  only cars in the carpark can leave
+}%
+\@xx{}%
+ \@x{\@s{16.4} \.{\land} carpark \.{'} \.{=} carpark \.{\,\backslash\,} \{ car
+ \}}%
+\@pvspace{8.0pt}%
+\@x{ Next \.{\defeq}}%
+\@x{\@s{16.4} \.{\lor} \E\, car \.{\in} Cars \.{:} Enters ( car )}%
+\@x{\@s{16.4} \.{\lor} \E\, car \.{\in} carpark \.{:} Leaves ( car )}%
+\@pvspace{8.0pt}%
+\@x{}\bottombar\@xx{}%
+\end{tlatex}
+
+\section{The Model}
+The car-park system has been run with two models, of different scales.
+
+\subsection{Model 1 Overview}
+Model 1 is a small model to quickly prove correctness of the specification.
+\paragraph{The Behaviour specification} is an \emph{initial
+predicate and next-state relation}.  These are filled in automatically if
+there is an \textit{Init} and \textit{Next} predicates. 
+\paragraph{The Model} values assigned to declared constants
+\subparagraph{The set of cars to use} is $\mathit{Cars}\leftarrow 1..10$
+\subparagraph{The capacity of the car-park} is set
+$\mathit{Capacity}\leftarrow 5$
+\subsection{Checks and verifications}
+\paragraph{Invariants} Two invariants are checked
+\subparagraph{The type invariant} \textit{TypeInvariant} 
+\subparagraph{The safety case} the \textit{Safety} predicate.
+
+\subsection{Results} A summary of the results
+\paragraph{Statistics} a summaries of the actions and number of states
+found.
+
+\begin{table}[h]
+\begin{tabular}{lr}
+	States found & \num{5121} \\
+ Distinct states & \num{638} \\ 
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\begin{tabular}{llrr}
+	\textbf{Action} & Location & States Found & \textbf{Distinct states} \\
+	\hline
+	\textit{Init}   & Line 11 & 1 & 1 \\
+	\textit{Enters} & Line 13 & \num{2560} & 637 \\
+	\textit{Next}   & Line 24 & \num{2560} & 0 
+\end{tabular}
+\end{table}
+
+\subsection{Model 2 Overview}
+Model 2 is a large model to show how quickly states can build up.
+Apart from the model parameters, all the tests are the same.
+
+\paragraph{The Model} values assigned to declared constants
+\subparagraph{The set of cars to use} is $\mathit{Cars}\leftarrow 1..100$
+\subparagraph{The capacity of the car-park} is set
+$\mathit{Capacity}\leftarrow 10$
+
+\subsection{Results} A summary of the results
+\paragraph{Statistics} a summaries of the actions and number of states
+found.  TLC (the model checker) took 27 minutes to find the number of states
+shown.  After a further 20-hours of runtime the model-checking had not
+completed and was terminated.  The remaining queue-size shows that there are
+still large numbers of states to add to the statistics.
+
+\begin{table}[h]
+\begin{tabular}{lr}
+	States found & \num{1375477467} \\
+	Distinct states & \num{285379380} \\ 
+	Queue size 		& \num{271624604} \\
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\begin{tabular}{llrr}
+	\textbf{Action} & Location & States Found & \textbf{Distinct states} \\
+	\hline
+	\textit{Init} & Line 11 & 1 & 1 \\
+	\textit{Enters} & Line 13 & \num{1310963481} & \num{284444823} \\
+	\textit{Next} & Line 24 & \num{64513985} & \num{934556} 
+\end{tabular}
+\end{table}
+
+\subsection{Discussion}
+\subsubsection{Model description} 
+\paragraph{The state of the car-park is the set of cars it contains.}
+For the purposes of
+the specification we are not concerned with how the cars are arranged in the
+car-park or the order in which they enter and leave.  
+
+So a \emph{set} is appropriate to model the state.  Using a finite-set allows
+us to count the size of the set; how many cars are in the car-park.
+
+\subparagraph{The initial conditions} are that the car-park is empty.\\
+(The empty set \{\} )
+
+\subparagraph{The type invariant} is that the set modelling the car-park is
+some subset of the set of Cars in the model.
+
+\subparagraph{The safety invariant} Is that the size of the set of cars in the
+car-park should not exceed the capacity.  As the state-variable is a
+finite-set, it could be argued that this is part of the type-invariant.
+
+\paragraph{The enter operation} has a guard condition that
+there are spaces available, and that a car is not already in the car-park.
+The state is updated by adding the car to the set of cars in the car-park.
+
+\paragraph{The exit operation} is guarded by the condition
+that a car must be in the car-park to exit.  The state is updated removing
+the car from the car-park
+
+\paragraph{The Next relation} is that either there is a car that can enter the
+car-park, or that there is a car in the car-park that can exit.
+
+\subsubsection{Interpretation of results}
+The specification makes no assumptions about the distribution of cars in the
+car-park, nor the order they enter and leave.
+
+Model 1 is small enough to run in a reasonable amount of time, and is
+sufficient to verify the specification.
+
+Model 2 generates a huge number of states and consequently requires a long
+time to run.  The results from it add nothing to the verification of the
+model.  
+
+\begin{infobox}{\warning}
+	Be careful not to use an over-large set of model data.  Larger models
+	often add little extra information.  The number of states and runtime of
+	the model checking  grow exponentially.
+
+	\paragraph{The moral of the tale} use as small a model as is practicable
+	to fully check the specification.
+\end{infobox}
+
+\end{document}
+
+\endinput
+%%
+%% End of file `assignment-template.tex'.
